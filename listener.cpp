@@ -70,7 +70,7 @@ void parse_eddystone_frame(AdvertisingResponse ad)
             success = parse_eid_frame(frame_data, ad);
             break;
         default:
-            cout << "UNK frame from " << ad.address << ": " << print_vector(frame_data.begin(), frame_data.end()) << endl;
+            //cout << "UNK frame from " << ad.address << ": " << print_vector(frame_data.begin(), frame_data.end()) << endl;
             success = true;
     }
 
