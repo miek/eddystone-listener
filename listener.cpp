@@ -23,6 +23,12 @@
 using namespace std;
 using namespace BLEPP;
 
+void print_vector(std::vector<uint8_t>::const_iterator begin, std::vector<uint8_t>::const_iterator end)
+{
+    for (auto i = begin; i != end; i++)
+        std::cout << std::hex << (int)*i << ' ';
+}
+
 void parse_eid_frame(std::vector<uint8_t> data, AdvertisingResponse ad)
 {
 }
@@ -38,8 +44,7 @@ void parse_eddystone_frame(AdvertisingResponse ad)
 
     // Debug printout
     auto data = ad.unparsed_data_with_types[0];
-    for (auto i = data.begin(); i != data.end(); i++)
-        std::cout << std::hex << (int)*i << ' ';
+    print_vector(data.begin(), data.end());
     std::cout << endl;
 
     if (data.size() < 4)
