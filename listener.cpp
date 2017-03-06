@@ -29,23 +29,29 @@ void print_vector(std::vector<uint8_t>::const_iterator begin, std::vector<uint8_
         std::cout << std::hex << (int)*i << ' ';
 }
 
-void parse_eid_frame(std::vector<uint8_t> data, AdvertisingResponse ad)
+bool parse_eid_frame(std::vector<uint8_t> data, AdvertisingResponse ad)
 {
+    std::cout << "EID frame from " << ad.address << ": ";
+    print_vector(data.begin(), data.end());
+    std::cout << endl;
+
+    return true;
 }
 
-void parse_tlm_frame(std::vector<uint8_t> data, AdvertisingResponse ad)
+bool parse_tlm_frame(std::vector<uint8_t> data, AdvertisingResponse ad)
 {
+    std::cout << "TLM frame from " << ad.address << ": ";
+    print_vector(data.begin(), data.end());
+    std::cout << endl;
+
+    return true;
 }
 
 void parse_eddystone_frame(AdvertisingResponse ad)
 {
+    auto data = ad.unparsed_data_with_types[0];
     if (ad.unparsed_data_with_types.size() <= 0)
         return;
-
-    // Debug printout
-    auto data = ad.unparsed_data_with_types[0];
-    print_vector(data.begin(), data.end());
-    std::cout << endl;
 
     if (data.size() < 4)
         return;
@@ -58,14 +64,21 @@ void parse_eddystone_frame(AdvertisingResponse ad)
     if (data[1] != 0xAA || data[2] != 0xFE)
         return;
 
+    bool success = false;
     std::vector<uint8_t> frame_data(data.begin() + 3, data.end());
     switch (frame_data[0]) {
         case 0x20:
-            parse_tlm_frame(frame_data, ad);
+            success = parse_tlm_frame(frame_data, ad);
             break;
         case 0x30:
-            parse_eid_frame(frame_data, ad);
+            success = parse_eid_frame(frame_data, ad);
             break;
+    }
+
+    if (!success) {
+        // Debug printout
+        print_vector(data.begin(), data.end());
+        std::cout << endl;
     }
 }
 
