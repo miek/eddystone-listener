@@ -23,6 +23,14 @@
 using namespace std;
 using namespace BLEPP;
 
+void parse_eid_frame(std::vector<uint8_t> data, AdvertisingResponse ad)
+{
+}
+
+void parse_tlm_frame(std::vector<uint8_t> data, AdvertisingResponse ad)
+{
+}
+
 void parse_eddystone_frame(AdvertisingResponse ad)
 {
     if (ad.unparsed_data_with_types.size() <= 0)
@@ -34,7 +42,7 @@ void parse_eddystone_frame(AdvertisingResponse ad)
         std::cout << std::hex << (int)*i << ' ';
     std::cout << endl;
 
-    if (data.size() < 3)
+    if (data.size() < 4)
         return;
 
     // 'Service Data'
@@ -45,7 +53,15 @@ void parse_eddystone_frame(AdvertisingResponse ad)
     if (data[1] != 0xAA || data[2] != 0xFE)
         return;
 
-    std::cout << "Got Eddystone frame"; 
+    std::vector<uint8_t> frame_data(data.begin() + 3, data.end());
+    switch (frame_data[0]) {
+        case 0x20:
+            parse_tlm_frame(frame_data, ad);
+            break;
+        case 0x30:
+            parse_eid_frame(frame_data, ad);
+            break;
+    }
 }
 
 void catch_function(int)
