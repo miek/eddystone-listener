@@ -23,27 +23,23 @@
 using namespace std;
 using namespace BLEPP;
 
-void print_vector(std::vector<uint8_t>::const_iterator begin, std::vector<uint8_t>::const_iterator end)
+std::string print_vector(std::vector<uint8_t>::const_iterator begin, std::vector<uint8_t>::const_iterator end)
 {
+    ostringstream stream;
     for (auto i = begin; i != end; i++)
-        std::cout << std::hex << (int)*i << ' ';
+        stream << std::hex << (int)*i << ' ';
+    return stream.str();
 }
 
 bool parse_eid_frame(std::vector<uint8_t> data, AdvertisingResponse ad)
 {
-    std::cout << "EID frame from " << ad.address << ": ";
-    print_vector(data.begin(), data.end());
-    std::cout << endl;
-
+    cout << "EID frame from " << ad.address << ": " << print_vector(data.begin(), data.end()) << endl;
     return true;
 }
 
 bool parse_tlm_frame(std::vector<uint8_t> data, AdvertisingResponse ad)
 {
-    std::cout << "TLM frame from " << ad.address << ": ";
-    print_vector(data.begin(), data.end());
-    std::cout << endl;
-
+    cout << "TLM frame from " << ad.address << ": " << print_vector(data.begin(), data.end()) << endl;
     return true;
 }
 
@@ -73,12 +69,14 @@ void parse_eddystone_frame(AdvertisingResponse ad)
         case 0x30:
             success = parse_eid_frame(frame_data, ad);
             break;
+        default:
+            cout << "UNK frame from " << ad.address << ": " << print_vector(frame_data.begin(), frame_data.end()) << endl;
+            success = true;
     }
 
     if (!success) {
         // Debug printout
-        print_vector(data.begin(), data.end());
-        std::cout << endl;
+        cout << "Parse failed: " << print_vector(data.begin(), data.end()) << endl;
     }
 }
 
